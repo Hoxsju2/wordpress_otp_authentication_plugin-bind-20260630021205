@@ -10,13 +10,12 @@ jQuery(document).ready(function($) {
             this.bindEvents();
             this.initializeForm();
             
-            // If the wrapper has data-auto-open (e.g. on the dedicated shortcode page), force it open immediately
             if ($('#otp-auth-container').data('auto-open') === true) {
                 $('#otp-auth-container').addClass('is-active').show();
                 $('body').addClass('otp-auth-overlay-active');
             }
             
-            console.log('OTPAuth initialized (v1.2.6) - UI State & Chrome Redirect Fixes Active');
+            console.log('OTPAuth initialized (v1.2.7) - Mobile Scroll & JSON Parse Fixes Active');
         },
         
         ensureBodyAppend: function() {
@@ -33,14 +32,12 @@ jQuery(document).ready(function($) {
         },
         
         bindEvents: function() {
-            // Triggering the overlay from the Global Header Button
             $(document).on('click', '.otp-login-trigger', function(e) {
                 e.preventDefault();
                 $('#otp-auth-container').hide().addClass('is-active').fadeIn(300);
                 $('body').addClass('otp-auth-overlay-active');
             });
 
-            // Close button functionality for overlay
             $(document).on('click', '#otp-auth-close', function(e) {
                 e.preventDefault();
                 $('#otp-auth-container').fadeOut(300, function() {
@@ -49,20 +46,15 @@ jQuery(document).ready(function($) {
                 });
             });
 
-            // Tab switching
             $(document).on('click', '.otp-auth-tab', this.handleTabSwitch.bind(this));
-            
-            // Explicit button clicks
             $(document).on('click', '#send-otp-btn', this.handleSendClick.bind(this));
             $(document).on('click', '#verify-otp-btn', this.handleVerifyClick.bind(this));
             
-            // Prevent actual form submission strictly
             $(document).on('submit', '#otp-auth-form', function(e) {
                 e.preventDefault();
                 return false;
             });
 
-            // Handle Mobile Keyboard "Go" / "Enter" Button
             $(document).on('keypress', '#otp_email', function(e) {
                 if (e.which === 13) {
                     e.preventDefault();
@@ -77,13 +69,8 @@ jQuery(document).ready(function($) {
                 }
             });
             
-            // Back button
             $(document).on('click', '#back-to-email', this.goToEmailStep.bind(this));
-            
-            // Resend OTP
             $(document).on('click', '#resend-otp', this.resendOTP.bind(this));
-            
-            // OTP input formatting (Bulletproof Pasting)
             $(document).on('input', '#otp_code', this.formatOTPInput.bind(this));
         },
         
@@ -94,7 +81,7 @@ jQuery(document).ready(function($) {
             this.updateHeaderText();
             
             $('.otp-auth-tab').removeClass('active');
-            $('.otp-auth-tab[data-tab=\"' + this.currentAction + '\"]').addClass('active');
+            $('.otp-auth-tab[data-tab="' + this.currentAction + '"]').addClass('active');
         },
         
         updateHeaderText: function() {
@@ -151,7 +138,6 @@ jQuery(document).ready(function($) {
                 return;
             }
             
-            // FIX: Lock exactly the Send button, ignore steps
             this.setButtonLoading('#send-otp-btn', true);
             this.clearMessages();
             
@@ -159,7 +145,7 @@ jQuery(document).ready(function($) {
                 action: 'send_otp',
                 email: email,
                 action_type: this.currentAction,
-                nonce: $('input[name=\"nonce\"]').val() || otpAuth.nonce
+                nonce: $('input[name="nonce"]').val() || otpAuth.nonce
             };
             
             const captchaResponse = this.getCaptchaResponse();
@@ -172,10 +158,10 @@ jQuery(document).ready(function($) {
                 type: 'POST',
                 data: data,
                 timeout: 30000,
+                dataType: 'text', // V1.2.7: Forces jQuery to ignore invalid JSON headers preventing parse errors
                 success: this.handleSendOTPSuccess.bind(this),
                 error: this.handleAjaxError.bind(this),
                 complete: function() {
-                    // FIX: Unlock exactly the Send button, prevent race condition freezing Step 2
                     this.setButtonLoading('#send-otp-btn', false);
                 }.bind(this)
             });
@@ -184,10 +170,12 @@ jQuery(document).ready(function($) {
         handleSendOTPSuccess: function(response) {
             if (typeof response === 'string') {
                 try {
-                    const jsonMatch = response.match(/\{.*\}/s);
+                    // V1.2.7: Advanced Regex to ignore HTML/Warnings injected by mobile carriers or plugins
+                    const jsonMatch = response.match(/\{[\s\S]*\}/);
                     response = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(response);
                 } catch (e) {
                     this.showMessage('[ERR_PARSE_ERROR] Server returned an invalid response. Please try again.', 'error');
+                    console.error("Raw Response:", response);
                     this.resetCaptcha();
                     return;
                 }
@@ -197,7 +185,7 @@ jQuery(document).ready(function($) {
                 const msg = (response.data && response.data.message) ? response.data.message : 'Success!';
                 this.showMessage(msg, 'success');
                 this.goToOTPStep();
-                this.startResendTimer(); // Start 30s countdown
+                this.startResendTimer();
             } else {
                 const msg = (response && response.data && response.data.message) ? response.data.message : '[ERR_SEND_FAIL] Error sending code.';
                 this.showMessage(msg, 'error');
@@ -209,7 +197,7 @@ jQuery(document).ready(function($) {
             if (this.timerInterval) clearInterval(this.timerInterval);
             
             const $resendWrapper = $('.otp-auth-resend');
-            $resendWrapper.html(`<p class=\"otp-timer-text\">Resend code in <span class=\"otp-timer-count\">30s</span></p>`);
+            $resendWrapper.html(`<p class="otp-timer-text">Resend code in <span class="otp-timer-count">30s</span></p>`);
             
             let timeLeft = 30;
             this.timerInterval = setInterval(() => {
@@ -218,7 +206,7 @@ jQuery(document).ready(function($) {
                 
                 if (timeLeft <= 0) {
                     clearInterval(this.timerInterval);
-                    $resendWrapper.html(`<p>Didn't receive the code? <button type=\"button\" id=\"resend-otp\" class=\"otp-auth-link\">Resend Code</button></p>`);
+                    $resendWrapper.html(`<p>Didn't receive the code? <button type="button" id="resend-otp" class="otp-auth-link">Resend Code</button></p>`);
                 }
             }, 1000);
         },
@@ -233,7 +221,6 @@ jQuery(document).ready(function($) {
                 return;
             }
             
-            // FIX: Lock exactly the Verify button
             this.setButtonLoading('#verify-otp-btn', true);
             this.clearMessages();
             
@@ -243,18 +230,18 @@ jQuery(document).ready(function($) {
                 otp: otp,
                 action_type: this.currentAction,
                 redirect_url: window.location.href,
-                nonce: $('input[name=\"nonce\"]').val() || otpAuth.nonce
+                nonce: $('input[name="nonce"]').val() || (typeof otpAuth !== 'undefined' ? otpAuth.nonce : '')
             };
             
             $.ajax({
-                url: otpAuth.ajaxurl,
+                url: typeof otpAuth !== 'undefined' ? otpAuth.ajaxurl : '/wp-admin/admin-ajax.php',
                 type: 'POST',
                 data: data,
                 timeout: 30000,
+                dataType: 'text', // V1.2.7: Crucial for stopping mobile carrier parse exceptions
                 success: this.handleVerifyOTPSuccess.bind(this),
                 error: this.handleAjaxError.bind(this),
                 complete: function() {
-                    // FIX: Unlock exactly the Verify button, but ONLY if we aren't redirecting
                     if (!this.isRedirecting) {
                         this.setButtonLoading('#verify-otp-btn', false);
                     }
@@ -265,10 +252,11 @@ jQuery(document).ready(function($) {
         handleVerifyOTPSuccess: function(response) {
             if (typeof response === 'string') {
                 try {
-                    const jsonMatch = response.match(/\{.*\}/s);
+                    const jsonMatch = response.match(/\{[\s\S]*\}/);
                     response = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(response);
                 } catch (e) {
                     this.showMessage('[ERR_PARSE_ERROR] Server error during verification. Please try again.', 'error');
+                    console.error("Raw Response:", response);
                     return;
                 }
             }
@@ -278,11 +266,10 @@ jQuery(document).ready(function($) {
                 this.showMessage(msg, 'success');
                 
                 this.isRedirecting = true; 
-                this.setButtonLoading('#verify-otp-btn', true); // Keep the UI button locked
+                this.setButtonLoading('#verify-otp-btn', true);
                 
                 const redirectUrl = (response.data && response.data.redirect_url) ? response.data.redirect_url : window.location.href;
                 
-                // V1.2.6 AGGRESSIVE REDIRECT FIX FOR CHROME
                 setTimeout(function() {
                     try {
                         window.location.assign(redirectUrl);
@@ -343,7 +330,7 @@ jQuery(document).ready(function($) {
         
         showMessage: function(message, type) {
             const $container = $('#otp-auth-messages');
-            const $message = $('<div class=\"otp-auth-message ' + type + '\">' + message + '</div>');
+            const $message = $('<div class="otp-auth-message ' + type + '">' + message + '</div>');
             
             $container.empty().append($message);
             
@@ -359,7 +346,6 @@ jQuery(document).ready(function($) {
         },
         
         formatOTPInput: function(e) {
-            // V1.2.6 Mobile Paste Fix: Strip absolutely all non-numeric characters (including invisible iOS spaces)
             let value = e.target.value.replace(/[^\d]/g, '');
             if (value.length > 6) {
                 value = value.substring(0, 6);
@@ -396,33 +382,47 @@ jQuery(document).ready(function($) {
             
             this.isRedirecting = false;
             
+            // V1.2.7: Completely rewrote error handler to explicitly expose exact failure causes
             let errorCode = 'ERR_UNKNOWN';
             let errorMessage = 'An error occurred. Please try again.';
             
-            if (xhr.status === 0) {
-                errorCode = 'ERR_NETWORK';
-                errorMessage = 'Network error or request blocked. Please check your internet connection.';
+            if (xhr.status === 0 || status === 'timeout') {
+                errorCode = status === 'timeout' ? 'ERR_TIMEOUT' : 'ERR_NETWORK';
+                errorMessage = 'Network timeout or request blocked. Please check your internet connection.';
             } else if (xhr.responseText === '-1' || xhr.responseText === '0') {
                 errorCode = 'ERR_TOKEN_EXPIRED';
                 errorMessage = 'Security token expired. Please refresh the page and try again.';
+            } else if (xhr.status === 403) {
+                errorCode = 'ERR_FORBIDDEN';
+                errorMessage = 'Access denied by server firewall. Please refresh and try again.';
             } else if (xhr.status >= 500) {
-                errorCode = 'ERR_SERVER_500';
-                errorMessage = 'Server error. Please try again later.';
-            } else if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
-                errorCode = 'ERR_API';
-                errorMessage = xhr.responseJSON.data.message;
+                errorCode = 'ERR_SERVER_' + xhr.status;
+                errorMessage = 'Server error processing request. Please try again later.';
             } else if (xhr.responseText) {
                 try {
-                    const response = JSON.parse(xhr.responseText);
+                    const jsonMatch = xhr.responseText.match(/\{[\s\S]*\}/);
+                    const response = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(xhr.responseText);
+                    
                     if (response && response.data && response.data.message) {
                         errorCode = 'ERR_API';
                         errorMessage = response.data.message;
+                    } else if (response && response.message) {
+                        errorCode = 'ERR_API';
+                        errorMessage = response.message;
+                    } else {
+                        errorCode = 'ERR_HTTP_' + xhr.status;
+                        errorMessage = 'Unexpected response format. (Status ' + xhr.status + ')';
                     }
                 } catch (e) {
-                    errorCode = 'ERR_PARSE';
+                    errorCode = 'ERR_PARSE_' + xhr.status;
+                    errorMessage = 'Server returned an invalid format. (Status ' + xhr.status + ')';
                 }
+            } else if (xhr.status > 0) {
+                errorCode = 'ERR_HTTP_' + xhr.status;
+                errorMessage = 'Request failed with status: ' + xhr.status;
             }
             
+            console.error("AJAX Error Details:", { status: xhr.status, text: xhr.statusText, response: xhr.responseText });
             this.showMessage(`[${errorCode}] ${errorMessage}`, 'error');
             this.resetCaptcha();
         }
