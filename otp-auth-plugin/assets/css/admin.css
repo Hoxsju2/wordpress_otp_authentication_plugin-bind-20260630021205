@@ -1,0 +1,499 @@
+/* OTP Auth Plugin Admin Styles - Version 1.1.4 */
+.otp-auth-admin-container {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.otp-auth-admin-main {
+  flex: 2;
+}
+
+.otp-auth-admin-sidebar {
+  flex: 1;
+  max-width: 300px;
+}
+
+.otp-auth-shortcodes-info,
+.otp-auth-virtual-pages,
+.otp-auth-button-preview,
+.otp-auth-support-info {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.otp-auth-shortcodes-info h3,
+.otp-auth-virtual-pages h3,
+.otp-auth-button-preview h3,
+.otp-auth-support-info h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #1d2327;
+}
+
+.shortcode-item {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f1;
+}
+
+.shortcode-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.shortcode-item code {
+  display: block;
+  background: #f6f7f7;
+  padding: 8px 12px;
+  border-radius: 3px;
+  font-size: 13px;
+  margin-bottom: 8px;
+  border-left: 4px solid #0073aa;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.shortcode-item code:hover {
+  background: #e8f4f8;
+}
+
+.otp-auth-virtual-pages ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.otp-auth-virtual-pages li {
+  margin-bottom: 8px;
+}
+
+.otp-auth-virtual-pages code {
+  background: #f6f7f7;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  border-left: 4px solid #00a32a;
+}
+
+.shortcode-item p {
+  margin: 0;
+  font-size: 13px;
+  color: #646970;
+  line-height: 1.5;
+}
+
+/* Button Preview Styles */
+.otp-auth-button-preview {
+  text-align: center;
+}
+
+#button-preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.preview-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 2px solid;
+  min-width: 100px;
+}
+
+.preview-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-icon svg {
+  display: block;
+}
+
+.preview-text {
+  font-weight: 500;
+}
+
+/* Icon Selection and Preview Styles */
+.icon-select {
+  min-width: 200px;
+}
+
+.icon-preview {
+  min-height: 40px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+}
+
+.icon-preview svg {
+  margin-right: 8px;
+}
+
+/* Icon Size Controls */
+#icon_size_slider {
+  vertical-align: middle;
+}
+
+#icon_size_display {
+  display: inline-block;
+  min-width: 40px;
+  font-family: monospace;
+  background: #f1f1f1;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Color Input Styles */
+.color-input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+input[type="color"] {
+  width: 50px;
+  height: 30px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.color-text-input {
+  width: 100px;
+  font-family: monospace;
+}
+
+/* Email validation styles */
+.invalid-email {
+  border-color: #d63638 !important;
+  box-shadow: 0 0 2px rgba(214, 54, 56, 0.8) !important;
+}
+
+.email-validation-error {
+  color: #d63638;
+  font-size: 13px;
+  margin-top: 5px;
+  font-weight: normal;
+}
+
+/* Required field indicator */
+input[required] + .description:after {
+  content: " *";
+  color: #d63638;
+  font-weight: bold;
+}
+
+/* Form styling improvements */
+.form-table th {
+  width: 200px;
+  padding: 15px 10px 15px 0;
+}
+
+.form-table td {
+  padding: 15px 10px;
+}
+
+.form-table input[type="text"],
+.form-table input[type="email"],
+.form-table input[type="number"],
+.form-table input[type="password"],
+.form-table input[type="url"],
+.form-table input[type="color"],
+.form-table input[type="range"] {
+  max-width: 400px;
+}
+
+.form-table input[type="email"][required] {
+  border-color: #0073aa;
+}
+
+.form-table select {
+  min-width: 200px;
+}
+
+.form-table fieldset {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 4px;
+  max-width: 400px;
+}
+
+.form-table fieldset label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.form-table fieldset input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.description {
+  font-style: italic;
+  color: #646970;
+  margin-top: 5px;
+}
+
+/* Important descriptions */
+.description[style*="color: #d63638"] {
+  background: #fee;
+  padding: 8px;
+  border-radius: 4px;
+  border-left: 4px solid #d63638;
+  font-style: normal;
+}
+
+/* Button styling section styles */
+.form-table tr.button-styling-row td {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-table tr.button-styling-row input[type="color"] {
+  width: 50px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.form-table tr.button-styling-row input[type="text"] {
+  width: 100px;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.form-table tr.button-styling-row input[type="number"] {
+  width: 80px;
+}
+
+.form-table tr.button-styling-row input[type="range"] {
+  width: 200px;
+  margin: 0 10px;
+}
+
+/* Conditional field styling */
+#custom_redirect_url {
+  margin-top: 10px;
+}
+
+/* Meta box styles */
+.otp-auth-meta-box {
+  padding: 10px;
+}
+
+.otp-auth-meta-box label {
+  font-weight: 600;
+}
+
+.otp-auth-meta-box input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Section headers */
+h2.hndle {
+  border-bottom: 1px solid #e1e1e1;
+  padding-bottom: 8px;
+}
+
+/* Enhanced notice styles */
+.notice.notice-error ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.notice.notice-error li {
+  margin-bottom: 5px;
+}
+
+/* Validation styling */
+.invalid-color {
+  border-color: #d63638 !important;
+  box-shadow: 0 0 2px rgba(214, 54, 56, 0.8) !important;
+}
+
+.valid-color {
+  border-color: #00a32a !important;
+  box-shadow: 0 0 2px rgba(0, 163, 42, 0.8) !important;
+}
+
+/* Icon selection styling */
+.icon-select option {
+  padding: 5px;
+}
+
+/* Hide icons data script */
+#otp-auth-icons-data {
+  display: none;
+}
+
+/* Responsive admin layout */
+@media (max-width: 1024px) {
+  .otp-auth-admin-container {
+    flex-direction: column;
+  }
+  
+  .otp-auth-admin-sidebar {
+    max-width: none;
+  }
+  
+  #button-preview-container {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+}
+
+@media (max-width: 768px) {
+  .otp-auth-shortcodes-info,
+  .otp-auth-virtual-pages,
+  .otp-auth-button-preview,
+  .otp-auth-support-info {
+    padding: 15px;
+  }
+  
+  .form-table th,
+  .form-table td {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+  }
+  
+  .form-table th {
+    border-bottom: none;
+  }
+  
+  .form-table input[type="text"],
+  .form-table input[type="email"],
+  .form-table input[type="number"],
+  .form-table input[type="password"],
+  .form-table input[type="url"] {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .form-table fieldset {
+    max-width: none;
+  }
+  
+  .form-table tr.button-styling-row td {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .form-table tr.button-styling-row input[type="range"] {
+    width: 100%;
+    margin: 10px 0;
+  }
+  
+  #button-preview-container {
+    flex-direction: column;
+  }
+  
+  .icon-select {
+    width: 100%;
+  }
+}
+
+/* Settings sections styling */
+.form-table h2 {
+  background: #f1f1f1;
+  padding: 12px;
+  margin: 20px 0 0 0;
+  border-left: 4px solid #0073aa;
+}
+
+/* Form submission loading state */
+.form-table input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Focus states */
+.form-table input:focus {
+  border-color: #0073aa;
+  box-shadow: 0 0 0 1px #0073aa;
+}
+
+/* Icon preview animations */
+.icon-preview svg {
+  transition: all 0.2s ease;
+}
+
+.icon-preview:hover svg {
+  transform: scale(1.1);
+}
+
+/* V1.2.6 Testing Tool Styles */
+.otp-auth-testing-tool {
+  margin-top: 20px;
+}
+.otp-test-layout {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.otp-test-controls {
+  flex: 1;
+  min-width: 350px;
+}
+.otp-test-console-container {
+  flex: 1;
+  min-width: 350px;
+  display: flex;
+  flex-direction: column;
+}
+.otp-test-card {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 4px;
+  padding: 15px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+}
+.otp-test-card h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  color: #1d2327;
+}
+.otp-test-console {
+  background: #1e1e1e;
+  color: #00ff00;
+  font-family: monospace;
+  padding: 15px;
+  height: 400px;
+  overflow-y: auto;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.otp-test-console span.error {
+  color: #ff5555;
+}
+.otp-test-console span.success {
+  color: #55ff55;
+}
+.otp-test-console span.info {
+  color: #aaaaaa;
+}
