@@ -30,7 +30,9 @@ class OTP_Auth_Shortcodes {
         
         if (is_user_logged_in()) {
             // Show logout button
-            $logout_url = wp_logout_url();
+            // V1.2.8: Get the exact current URL so we can pass it securely back into the logout redirect filter
+            $current_url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+            $logout_url = wp_logout_url($current_url);
             
             $icon_html = '';
             $text_html = '';

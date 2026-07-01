@@ -3,7 +3,7 @@
  * Plugin Name: OTP Authentication Plugin
  * Plugin URI: https://yourwebsite.com/
  * Description: A comprehensive OTP-based authentication system with email verification, reCAPTCHA support, and modern design. Fully compatible with WordPress 7.0.
- * Version: 1.2.7
+ * Version: 1.2.8
  * Author: Your Name
  * License: GPL v2 or later
  * Text Domain: otp-auth-plugin
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('OTP_AUTH_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('OTP_AUTH_PLUGIN_PATH', plugin_dir_path(__FILE__));
-define('OTP_AUTH_VERSION', '1.2.7');
+define('OTP_AUTH_VERSION', '1.2.8');
 
 class OTPAuthPlugin {
     
