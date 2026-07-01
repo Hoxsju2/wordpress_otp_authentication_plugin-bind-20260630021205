@@ -25,6 +25,9 @@ class OTP_Auth_Core {
         add_filter('wp_nav_menu_items', array($this, 'replace_login_links'), 10, 2);
         add_filter('login_url', array($this, 'replace_login_url'), 10, 3);
         add_filter('register_url', array($this, 'replace_register_url'));
+        
+        // V1.2.8: Smart Logout Redirect Logic
+        add_filter('logout_redirect', array($this, 'smart_logout_redirect'), 10, 3);
     }
     
     public function enqueue_frontend_scripts() {
@@ -175,5 +178,46 @@ class OTP_Auth_Core {
             "SELECT ID FROM {$wpdb->posts} WHERE post_content LIKE '%[otp_auth_page]%' AND post_status = 'publish' AND post_type = 'page' LIMIT 1"
         );
         return $page ? get_permalink($page->ID) : home_url('/otp-auth/');
+    }
+
+    /**
+     * V1.2.8: Smart Logout Redirect Method
+     * Ensure users stay on their current page after logging out,
+     * EXCEPT if they are on a sensitive profile/dashboard page (redirect them to home).
+     */
+    public function smart_logout_redirect($redirect_to, $requested_redirect_to, $user) {
+        // If there's no specific redirect requested, try to use the referer
+        if (empty($requested_redirect_to)) {
+            $referer = wp_get_referer();
+            if ($referer) {
+                $redirect_to = $referer;
+            } else {
+                $redirect_to = home_url();
+            }
+        }
+        
+        // Parse the target redirect URL
+        $parsed_url = wp_parse_url($redirect_to);
+        $path = isset($parsed_url['path']) ? strtolower($parsed_url['path']) : '';
+        
+        // Define paths that should force a redirect to the homepage
+        $restricted_paths = array(
+            '/wp-admin',
+            '/dashboard',
+            '/my-account',
+            '/profile',
+            '/account',
+            '/author'
+        );
+        
+        // Check if the redirect target contains any of the restricted paths
+        foreach ($restricted_paths as $restricted_path) {
+            if (strpos($path, $restricted_path) !== false) {
+                return home_url();
+            }
+        }
+        
+        // If not restricted, stay on the requested page
+        return $redirect_to;
     }
 }
