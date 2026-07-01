@@ -1,4 +1,4 @@
-/* OTP Auth Plugin Frontend Styles - Version 1.2.7 */
+/* OTP Auth Plugin Frontend Styles - Version 1.4.0 */
 body.otp-auth-overlay-active {
   overflow: hidden !important;
 }
@@ -13,7 +13,7 @@ body.otp-auth-overlay-active {
   width: 100% !important;
   height: 100% !important;
   display: none !important; 
-  align-items: flex-start !important; /* V1.2.7: Changed from center to allow mobile scrolling */
+  align-items: flex-start !important;
   justify-content: center !important;
   padding: 40px 20px !important;
   background: rgba(0, 0, 0, 0.75) !important;
@@ -21,8 +21,8 @@ body.otp-auth-overlay-active {
   z-index: 2147483647 !important; 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   box-sizing: border-box !important;
-  overflow-y: auto !important; /* V1.2.7: Native scrolling on wrapper */
-  -webkit-overflow-scrolling: touch !important; /* V1.2.7: Smooth iOS scrolling */
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 /* Active state for the overlay */
@@ -36,12 +36,12 @@ body.otp-auth-overlay-active {
   padding: 40px !important;
   width: 100% !important;
   max-width: 420px !important;
-  margin: auto !important; /* V1.2.7: Flexbox trick to center if it fits, or stick to top if scrolling needed */
+  margin: auto !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
   position: relative !important;
   border: 1px solid #e5e7eb !important;
-  max-height: none !important; /* V1.2.7: Removed max-height */
-  overflow-y: visible !important; /* V1.2.7: Allow wrapper to handle scroll */
+  max-height: none !important;
+  overflow-y: visible !important;
   box-sizing: border-box !important;
 }
 
@@ -233,6 +233,46 @@ body.otp-auth-overlay-active {
   border-color: #d1d5db !important;
 }
 
+/* Google Auth Styles */
+.otp-auth-btn-google {
+  background: #ffffff !important;
+  color: #374151 !important;
+  border: 1px solid #d1d5db !important;
+  margin-bottom: 24px !important;
+}
+
+.otp-auth-btn-google:hover:not(:disabled):not(.loading) {
+  background: #f9fafb !important;
+  border-color: #9ca3af !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.google-icon {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.otp-auth-divider {
+  display: flex !important;
+  align-items: center !important;
+  text-align: center !important;
+  margin-bottom: 24px !important;
+}
+
+.otp-auth-divider::before,
+.otp-auth-divider::after {
+  content: '' !important;
+  flex: 1 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.otp-auth-divider span {
+  padding: 0 16px !important;
+  color: #6b7280 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
 .btn-loader {
   position: absolute !important;
   display: none !important; 
@@ -342,6 +382,9 @@ body.otp-auth-overlay-active {
 
 /* Loading states */
 .otp-auth-btn.loading .btn-text {
+  opacity: 0 !important;
+}
+.otp-auth-btn.loading .google-icon {
   opacity: 0 !important;
 }
 

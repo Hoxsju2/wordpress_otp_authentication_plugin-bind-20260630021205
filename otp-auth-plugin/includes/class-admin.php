@@ -138,6 +138,17 @@ class OTP_Auth_Admin {
         add_settings_field('recaptcha_secret', __('reCAPTCHA Secret Key', 'otp-auth-plugin'), array($this, 'recaptcha_secret_callback'), 'otp-auth-settings', 'otp_auth_captcha');
         add_settings_field('hcaptcha_site_key', __('hCaptcha Site Key', 'otp-auth-plugin'), array($this, 'hcaptcha_site_key_callback'), 'otp-auth-settings', 'otp_auth_captcha');
         add_settings_field('hcaptcha_secret', __('hCaptcha Secret Key', 'otp-auth-plugin'), array($this, 'hcaptcha_secret_callback'), 'otp-auth-settings', 'otp_auth_captcha');
+
+        // V1.3.0 GitHub Updater Settings Section
+        add_settings_section('otp_auth_github', __('GitHub Auto-Updates', 'otp-auth-plugin'), array($this, 'github_section_callback'), 'otp-auth-settings');
+        add_settings_field('github_repo', __('GitHub Repository', 'otp-auth-plugin'), array($this, 'github_repo_callback'), 'otp-auth-settings', 'otp_auth_github');
+        add_settings_field('github_token', __('Personal Access Token', 'otp-auth-plugin'), array($this, 'github_token_callback'), 'otp-auth-settings', 'otp_auth_github');
+        
+        // V1.4.0 Integrations Settings Section
+        add_settings_section('otp_auth_google', __('Google Sign-In Configuration', 'otp-auth-plugin'), array($this, 'google_section_callback'), 'otp-auth-integrations');
+        add_settings_field('google_login_enabled', __('Enable Google Login', 'otp-auth-plugin'), array($this, 'google_enabled_callback'), 'otp-auth-integrations', 'otp_auth_google');
+        add_settings_field('google_client_id', __('Google Client ID', 'otp-auth-plugin'), array($this, 'google_client_id_callback'), 'otp-auth-integrations', 'otp_auth_google');
+        add_settings_field('google_client_secret', __('Google Client Secret', 'otp-auth-plugin'), array($this, 'google_client_secret_callback'), 'otp-auth-integrations', 'otp_auth_google');
     }
     
     public function show_admin_notices() {
@@ -187,9 +198,9 @@ class OTP_Auth_Admin {
         <div class="wrap">
             <h1><?php _e('OTP Authentication Settings', 'otp-auth-plugin'); ?></h1>
             
-            <!-- V1.2.6 TABS IMPLEMENTATION -->
             <h2 class="nav-tab-wrapper">
                 <a href="?page=otp-auth-settings&tab=settings" class="nav-tab <?php echo $active_tab == 'settings' ? 'nav-tab-active' : ''; ?>"><?php _e('Plugin Settings', 'otp-auth-plugin'); ?></a>
+                <a href="?page=otp-auth-settings&tab=integrations" class="nav-tab <?php echo $active_tab == 'integrations' ? 'nav-tab-active' : ''; ?>"><?php _e('Integrations', 'otp-auth-plugin'); ?></a>
                 <a href="?page=otp-auth-settings&tab=testing" class="nav-tab <?php echo $active_tab == 'testing' ? 'nav-tab-active' : ''; ?>"><?php _e('Testing & Debugging', 'otp-auth-plugin'); ?></a>
             </h2>
 
@@ -242,6 +253,70 @@ class OTP_Auth_Admin {
                                 <span class="preview-text">Logout</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <?php elseif ($active_tab == 'integrations'): ?>
+            
+            <div class="otp-auth-admin-container">
+                <div class="otp-auth-admin-main">
+                    <form method="post" action="options.php">
+                        <?php
+                        settings_fields('otp_auth_settings');
+                        do_settings_sections('otp-auth-integrations');
+                        submit_button();
+                        ?>
+                    </form>
+                    
+                    <hr style="margin: 40px 0;">
+                    
+                    <div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 4px; box-shadow: 0 1px 1px rgba(0,0,0,0.04);">
+                        <h3 style="margin-top:0;">Test Google Configuration</h3>
+                        <p>Click the button below to safely test the OAuth handshake. This will not log you in, but it will return the verified email to ensure your settings are correct.</p>
+                        <button type="button" id="btn_test_google" class="button button-secondary">
+                            Test Google Configuration
+                        </button>
+                    </div>
+
+                    <script>
+                        document.getElementById('btn_test_google').addEventListener('click', function() {
+                            var btn = this;
+                            btn.disabled = true;
+                            btn.innerText = 'Connecting...';
+                            jQuery.post(ajaxurl, {
+                                action: 'test_google_auth_config',
+                            }, function(response) {
+                                btn.disabled = false;
+                                btn.innerText = 'Test Google Configuration';
+                                if (response.success && response.data.url) {
+                                    window.open(response.data.url, 'GoogleAuthTest', 'width=500,height=600');
+                                } else {
+                                    alert('Error: ' + (response.data.message || 'Unknown error'));
+                                }
+                            }).fail(function() {
+                                btn.disabled = false;
+                                btn.innerText = 'Test Google Configuration';
+                                alert('Server error occurred.');
+                            });
+                        });
+                    </script>
+                </div>
+                
+                <div class="otp-auth-admin-sidebar">
+                    <div class="otp-auth-support-info">
+                        <h3>Google Setup Instructions</h3>
+                        <ol style="margin-left: 15px; padding: 0;">
+                            <li>Go to the <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a>.</li>
+                            <li>Create a new project or select an existing one.</li>
+                            <li>Go to <strong>OAuth consent screen</strong> and configure it (Set to External, add your email).</li>
+                            <li>Go to <strong>Credentials</strong> &rarr; <strong>Create Credentials</strong> &rarr; <strong>OAuth client ID</strong>.</li>
+                            <li>Select <strong>Web application</strong>.</li>
+                            <li>Under <strong>Authorized redirect URIs</strong>, paste the exact URL below:<br><br>
+                                <code style="display:block;word-break:break-all;background:#f0f0f1;padding:8px;border-left:3px solid #0073aa;margin:5px 0;"><?php echo admin_url('admin-ajax.php?action=otp_google_callback'); ?></code>
+                            </li>
+                            <li>Click Create. Copy the Client ID and Client Secret into the fields on the left and save.</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -355,7 +430,16 @@ class OTP_Auth_Admin {
         $output['recaptcha_secret'] = sanitize_text_field($input['recaptcha_secret']);
         $output['hcaptcha_site_key'] = sanitize_text_field($input['hcaptcha_site_key']);
         $output['hcaptcha_secret'] = sanitize_text_field($input['hcaptcha_secret']);
+
+        // V1.3.0 GitHub Auto-Updater settings
+        $output['github_repo'] = sanitize_text_field($input['github_repo'] ?? '');
+        $output['github_token'] = sanitize_text_field($input['github_token'] ?? '');
         
+        // V1.4.0 Google Login settings
+        $output['google_login_enabled'] = isset($input['google_login_enabled']) ? 1 : 0;
+        $output['google_client_id'] = sanitize_text_field($input['google_client_id'] ?? '');
+        $output['google_client_secret'] = sanitize_text_field($input['google_client_secret'] ?? '');
+
         if (!empty($errors)) set_transient('otp_auth_validation_errors', $errors, 30);
         flush_rewrite_rules();
         return $output;
@@ -504,5 +588,46 @@ class OTP_Auth_Admin {
     public function hcaptcha_secret_callback() {
         $settings = get_option('otp_auth_settings', array());
         echo '<input type="password" name="otp_auth_settings[hcaptcha_secret]" value="' . esc_attr($settings['hcaptcha_secret'] ?? '') . '" class="regular-text" />';
+    }
+
+    // V1.3.0 GitHub Auto Updater Callbacks
+    public function github_section_callback() {
+        echo '<p>' . __('Configure GitHub repository details for automatic plugin updates. Every time you draft a new release on GitHub, the plugin will automatically detect it and show an update in the WordPress dashboard.', 'otp-auth-plugin') . '</p>';
+    }
+    
+    public function github_repo_callback() {
+        $settings = get_option('otp_auth_settings', array());
+        $value = $settings['github_repo'] ?? '';
+        echo '<input type="text" name="otp_auth_settings[github_repo]" value="' . esc_attr($value) . '" class="regular-text" placeholder="username/repository" />';
+        echo '<p class="description">' . __('Example: Hoxsju2/wordpress_otp_authentication_plugin', 'otp-auth-plugin') . '</p>';
+    }
+    
+    public function github_token_callback() {
+        $settings = get_option('otp_auth_settings', array());
+        $value = $settings['github_token'] ?? '';
+        echo '<input type="password" name="otp_auth_settings[github_token]" value="' . esc_attr($value) . '" class="regular-text" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />';
+        echo '<p class="description">' . __('Optional: Required only if the repository is private or to increase GitHub API rate limits. (Classic Tokens work best).', 'otp-auth-plugin') . '</p>';
+    }
+
+    // V1.4.0 Google Login Callbacks
+    public function google_section_callback() {
+        echo '<p>' . __('Enable and configure Google Sign-In to allow users to authenticate effortlessly.', 'otp-auth-plugin') . '</p>';
+    }
+    
+    public function google_enabled_callback() {
+        $settings = get_option('otp_auth_settings', array());
+        echo '<input type="checkbox" name="otp_auth_settings[google_login_enabled]" value="1" ' . (isset($settings['google_login_enabled']) && $settings['google_login_enabled'] ? 'checked' : '') . ' />';
+    }
+    
+    public function google_client_id_callback() {
+        $settings = get_option('otp_auth_settings', array());
+        $value = $settings['google_client_id'] ?? '';
+        echo '<input type="text" name="otp_auth_settings[google_client_id]" value="' . esc_attr($value) . '" class="regular-text" placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com" />';
+    }
+    
+    public function google_client_secret_callback() {
+        $settings = get_option('otp_auth_settings', array());
+        $value = $settings['google_client_secret'] ?? '';
+        echo '<input type="password" name="otp_auth_settings[google_client_secret]" value="' . esc_attr($value) . '" class="regular-text" placeholder="GOCSPX-xxxxxxxxxxxxxxxxxxxx" />';
     }
 }

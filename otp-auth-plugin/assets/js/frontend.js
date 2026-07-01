@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
                 $('body').addClass('otp-auth-overlay-active');
             }
             
-            console.log('OTPAuth initialized (v1.2.7) - Mobile Scroll & JSON Parse Fixes Active');
+            console.log('OTPAuth initialized (v1.4.0) - Google Sign-In Integration Active');
         },
         
         ensureBodyAppend: function() {
@@ -49,6 +49,9 @@ jQuery(document).ready(function($) {
             $(document).on('click', '.otp-auth-tab', this.handleTabSwitch.bind(this));
             $(document).on('click', '#send-otp-btn', this.handleSendClick.bind(this));
             $(document).on('click', '#verify-otp-btn', this.handleVerifyClick.bind(this));
+            
+            // Google Login Handler
+            $(document).on('click', '#google-login-btn', this.handleGoogleLogin.bind(this));
             
             $(document).on('submit', '#otp-auth-form', function(e) {
                 e.preventDefault();
@@ -112,6 +115,36 @@ jQuery(document).ready(function($) {
             this.clearMessages();
         },
         
+        handleGoogleLogin: function(e) {
+            e.preventDefault();
+            if (this.isProcessing()) return false;
+            
+            this.setButtonLoading('#google-login-btn', true);
+            this.clearMessages();
+            
+            $.ajax({
+                url: typeof otpAuth !== 'undefined' ? otpAuth.ajaxurl : '/wp-admin/admin-ajax.php',
+                type: 'POST',
+                data: {
+                    action: 'get_google_auth_url',
+                    nonce: $('input[name="nonce"]').val() || (typeof otpAuth !== 'undefined' ? otpAuth.nonce : '')
+                },
+                success: function(response) {
+                    if (response && response.success && response.data && response.data.url) {
+                        window.location.href = response.data.url;
+                    } else {
+                        const msg = (response && response.data && response.data.message) ? response.data.message : 'Failed to initialize Google Login. Check configuration.';
+                        this.showMessage(msg, 'error');
+                        this.setButtonLoading('#google-login-btn', false);
+                    }
+                }.bind(this),
+                error: function() {
+                    this.showMessage('Network error while connecting to Google.', 'error');
+                    this.setButtonLoading('#google-login-btn', false);
+                }.bind(this)
+            });
+        },
+        
         handleSendClick: function(e) {
             e.preventDefault();
             if (this.isProcessing()) return false;
@@ -158,7 +191,7 @@ jQuery(document).ready(function($) {
                 type: 'POST',
                 data: data,
                 timeout: 30000,
-                dataType: 'text', // V1.2.7: Forces jQuery to ignore invalid JSON headers preventing parse errors
+                dataType: 'text', 
                 success: this.handleSendOTPSuccess.bind(this),
                 error: this.handleAjaxError.bind(this),
                 complete: function() {
@@ -170,7 +203,6 @@ jQuery(document).ready(function($) {
         handleSendOTPSuccess: function(response) {
             if (typeof response === 'string') {
                 try {
-                    // V1.2.7: Advanced Regex to ignore HTML/Warnings injected by mobile carriers or plugins
                     const jsonMatch = response.match(/\{[\s\S]*\}/);
                     response = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(response);
                 } catch (e) {
@@ -238,7 +270,7 @@ jQuery(document).ready(function($) {
                 type: 'POST',
                 data: data,
                 timeout: 30000,
-                dataType: 'text', // V1.2.7: Crucial for stopping mobile carrier parse exceptions
+                dataType: 'text',
                 success: this.handleVerifyOTPSuccess.bind(this),
                 error: this.handleAjaxError.bind(this),
                 complete: function() {
@@ -325,7 +357,9 @@ jQuery(document).ready(function($) {
         },
         
         isProcessing: function() {
-            return $('#send-otp-btn').hasClass('loading') || $('#verify-otp-btn').hasClass('loading');
+            return $('#send-otp-btn').hasClass('loading') || 
+                   $('#verify-otp-btn').hasClass('loading') || 
+                   $('#google-login-btn').hasClass('loading');
         },
         
         showMessage: function(message, type) {
@@ -382,7 +416,6 @@ jQuery(document).ready(function($) {
             
             this.isRedirecting = false;
             
-            // V1.2.7: Completely rewrote error handler to explicitly expose exact failure causes
             let errorCode = 'ERR_UNKNOWN';
             let errorMessage = 'An error occurred. Please try again.';
             

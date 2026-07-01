@@ -2,8 +2,8 @@
 /**
  * Plugin Name: OTP Authentication Plugin
  * Plugin URI: https://yourwebsite.com/
- * Description: A comprehensive OTP-based authentication system with email verification, reCAPTCHA support, and modern design. Fully compatible with WordPress 7.0.
- * Version: 1.2.8
+ * Description: A comprehensive OTP-based authentication system with email verification, Google Sign-In, and modern design. Fully compatible with WordPress 7.0.
+ * Version: 1.4.0
  * Author: Your Name
  * License: GPL v2 or later
  * Text Domain: otp-auth-plugin
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('OTP_AUTH_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('OTP_AUTH_PLUGIN_PATH', plugin_dir_path(__FILE__));
-define('OTP_AUTH_VERSION', '1.2.8');
+define('OTP_AUTH_VERSION', '1.4.0');
 
 class OTPAuthPlugin {
     
@@ -49,6 +49,12 @@ class OTPAuthPlugin {
         require_once OTP_AUTH_PLUGIN_PATH . 'includes/class-activator.php';
         require_once OTP_AUTH_PLUGIN_PATH . 'includes/class-ajax.php';
         require_once OTP_AUTH_PLUGIN_PATH . 'includes/class-core.php';
+        
+        // V1.3.0 GitHub Auto Updater
+        require_once OTP_AUTH_PLUGIN_PATH . 'includes/class-github-updater.php';
+
+        // V1.4.0 Google Authentication
+        require_once OTP_AUTH_PLUGIN_PATH . 'includes/class-google-auth.php';
     }
     
     private function init_classes() {
@@ -63,6 +69,12 @@ class OTPAuthPlugin {
         // Version Modular Classes
         new OTP_Auth_Ajax();
         new OTP_Auth_Core();
+        
+        // V1.3.0 GitHub Auto Updater Class
+        new OTP_Auth_GitHub_Updater();
+
+        // V1.4.0 Google Authentication Class
+        new OTP_Auth_Google_Auth();
     }
     
     public function activate() {
